@@ -1,60 +1,59 @@
-# mind-maps-frontend
+# MindMapsFrontend
 
-Frontend for the Mind Maps application — an interactive tool for creating and managing mind maps.
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.1.
 
-Built with **Angular** and **Tailwind CSS**, fully responsive across mobile, tablet, and desktop.
+## Development server
 
-## Tech Stack
-
-- **Angular** — component-based SPA framework
-- **TypeScript** — statically typed JavaScript
-- **Tailwind CSS** — utility-first CSS for responsive design
-- **RxJS** — reactive programming for async data flows
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js (LTS)
-- npm or yarn
-- Angular CLI: `npm install -g @angular/cli`
-
-### Install dependencies
-
-```bash
-npm install
-```
-
-### Run the development server
+To start a local development server, run:
 
 ```bash
 ng serve
 ```
 
-Open [http://localhost:4200](http://localhost:4200) in your browser.
+Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
-> The backend must be running at `http://localhost:8080`. See [mind-maps-backend](../mind-maps-backend).
+## Code scaffolding
 
-## Backend API
+Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/auth/register` | Register a new user |
-| POST | `/auth/login` | Login — returns a JWT |
-| GET | `/api/me` | Get current user (requires JWT) |
+```bash
+ng generate component component-name
+```
 
-API docs (Swagger UI): [http://localhost:8080/docs](http://localhost:8080/docs)
+For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
 
-## Responsive Design
+```bash
+ng generate --help
+```
 
-The UI is designed mobile-first using Tailwind CSS breakpoints and adapts to:
+## Building
 
-- Mobile phones
-- Tablets
-- Desktops and large monitors
+To build the project run:
 
-## Running Tests
+```bash
+ng build
+```
+
+This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+
+## Running unit tests
+
+To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
 
 ```bash
 ng test
 ```
+
+## Running end-to-end tests
+
+For end-to-end (e2e) testing, run:
+
+```bash
+ng e2e
+```
+
+Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+
+## Additional Resources
+
+For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

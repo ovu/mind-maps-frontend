@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "frontend-design": {
+      "source": "everyinc/compound-engineering-plugin",
+      "sourceType": "github",
+      "computedHash": "3c3d87e02057af37946beff46df71555d88eae0d1c5735b718e02a2372cff358"
+    }
+  }
+}
