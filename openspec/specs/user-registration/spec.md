@@ -1,11 +1,21 @@
 ## ADDED Requirements
 
 ### Requirement: User can register with email and password
-The system SHALL provide a registration form at `/register` where a user can create an account by submitting their email and password to `POST /auth/register`.
+The system SHALL provide a registration form at `/register` where a user can create an account by submitting their email and password to `POST /auth/register`. The form SHALL also include an optional name field.
 
 #### Scenario: Successful registration
 - **WHEN** the user submits a valid email and password
 - **THEN** the system calls `POST /auth/register` with `{ email, password }`
+- **AND** on success, navigates to `/login`
+
+#### Scenario: Successful registration with name
+- **WHEN** the user submits a valid email, password, and name
+- **THEN** the system calls `POST /auth/register` with `{ email, password, name }`
+- **AND** on success, navigates to `/login`
+
+#### Scenario: Registration without name
+- **WHEN** the user submits a valid email and password without entering a name
+- **THEN** the system calls `POST /auth/register` with `{ email, password }` (no name field)
 - **AND** on success, navigates to `/login`
 
 #### Scenario: Registration fails with server error
