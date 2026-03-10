@@ -37,7 +37,7 @@ describe('Register', () => {
   it('should not submit with invalid email', () => {
     const fixture = TestBed.createComponent(Register);
     const component = fixture.componentInstance;
-    component.form.setValue({ email: 'not-an-email', password: 'pass123' });
+    component.form.setValue({ name: '', email: 'not-an-email', password: 'pass123' });
     component.submit();
     http.expectNone('http://localhost:8080/auth/register');
   });
@@ -47,7 +47,7 @@ describe('Register', () => {
     const component = fixture.componentInstance;
     const navigateSpy = vi.spyOn(router, 'navigate');
 
-    component.form.setValue({ email: 'a@b.com', password: 'pass123' });
+    component.form.setValue({ name: '', email: 'a@b.com', password: 'pass123' });
     component.submit();
 
     const req = http.expectOne('http://localhost:8080/auth/register');
@@ -57,11 +57,26 @@ describe('Register', () => {
     expect(navigateSpy).toHaveBeenCalledWith(['/login']);
   });
 
+  it('should include name in API request when provided', () => {
+    const fixture = TestBed.createComponent(Register);
+    const component = fixture.componentInstance;
+    const navigateSpy = vi.spyOn(router, 'navigate');
+
+    component.form.setValue({ name: 'Alice', email: 'a@b.com', password: 'pass123' });
+    component.submit();
+
+    const req = http.expectOne('http://localhost:8080/auth/register');
+    expect(req.request.body).toEqual({ email: 'a@b.com', password: 'pass123', name: 'Alice' });
+    req.flush({});
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/login']);
+  });
+
   it('should display server error message on failure', () => {
     const fixture = TestBed.createComponent(Register);
     const component = fixture.componentInstance;
 
-    component.form.setValue({ email: 'a@b.com', password: 'pass123' });
+    component.form.setValue({ name: '', email: 'a@b.com', password: 'pass123' });
     component.submit();
 
     const req = http.expectOne('http://localhost:8080/auth/register');

@@ -15,6 +15,7 @@ export class Register {
   private router = inject(Router);
 
   form = this.fb.group({
+    name: [''],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]]
   });
@@ -29,8 +30,8 @@ export class Register {
     if (this.form.invalid) return;
     this.loading.set(true);
     this.serverError.set(null);
-    const { email, password } = this.form.value;
-    this.auth.register(email!, password!).subscribe({
+    const { email, password, name } = this.form.value;
+    this.auth.register(email!, password!, name || undefined).subscribe({
       next: () => this.router.navigate(['/login']),
       error: (err) => {
         this.serverError.set(err.error?.error ?? 'Registration failed. Please try again.');

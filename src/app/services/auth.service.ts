@@ -17,8 +17,10 @@ export interface ApiError {
 export class AuthService {
   private http = inject(HttpClient);
 
-  register(email: string, password: string): Observable<unknown> {
-    return this.http.post(`${API_BASE}/auth/register`, { email, password });
+  register(email: string, password: string, name?: string): Observable<unknown> {
+    const body: Record<string, string> = { email, password };
+    if (name) body['name'] = name;
+    return this.http.post(`${API_BASE}/auth/register`, body);
   }
 
   login(email: string, password: string): Observable<AuthResponse> {

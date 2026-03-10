@@ -14,12 +14,14 @@ export class Welcome implements OnInit {
   private router = inject(Router);
 
   email = signal<string | null>(null);
+  name = signal<string | null>(null);
   loading = signal(true);
 
   ngOnInit() {
     this.user.getMe().subscribe({
       next: (profile) => {
         this.email.set(profile.email);
+        this.name.set(profile.name || null);
         this.loading.set(false);
       },
       error: (err) => {

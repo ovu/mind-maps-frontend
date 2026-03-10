@@ -30,6 +30,21 @@ describe('AuthService', () => {
       expect(req.request.body).toEqual({ email: 'a@b.com', password: 'pass' });
       req.flush({});
     });
+
+    it('includes name in request body when provided', () => {
+      service.register('a@b.com', 'pass', 'Alice').subscribe();
+      const req = http.expectOne('http://localhost:8080/auth/register');
+      expect(req.request.body).toEqual({ email: 'a@b.com', password: 'pass', name: 'Alice' });
+      req.flush({});
+    });
+
+    it('does not include name when not provided', () => {
+      service.register('a@b.com', 'pass').subscribe();
+      const req = http.expectOne('http://localhost:8080/auth/register');
+      expect(req.request.body).toEqual({ email: 'a@b.com', password: 'pass' });
+      expect(req.request.body).not.toHaveProperty('name');
+      req.flush({});
+    });
   });
 
   describe('login', () => {

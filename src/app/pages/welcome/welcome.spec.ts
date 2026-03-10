@@ -47,6 +47,52 @@ describe('Welcome', () => {
     expect(fixture.componentInstance.loading()).toBe(false);
   });
 
+  it('should display name in greeting when available', async () => {
+    const fixture = TestBed.createComponent(Welcome);
+    fixture.detectChanges();
+    const req = http.expectOne('http://localhost:8080/api/me');
+    req.flush({ email: 'user@example.com', name: 'Alice' });
+
+    await fixture.whenStable();
+    expect(fixture.componentInstance.name()).toBe('Alice');
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const heading = compiled.querySelector('h1');
+    expect(heading?.textContent).toContain('Alice');
+  });
+
+  it('should show generic welcome when name is absent', async () => {
+    const fixture = TestBed.createComponent(Welcome);
+    fixture.detectChanges();
+    const req = http.expectOne('http://localhost:8080/api/me');
+    req.flush({ email: 'user@example.com' });
+
+    await fixture.whenStable();
+    expect(fixture.componentInstance.name()).toBeNull();
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const heading = compiled.querySelector('h1');
+    expect(heading?.textContent).toContain('Welcome!');
+    expect(heading?.textContent).not.toContain(',');
+  });
+
+  it('should show generic welcome when name is empty string', async () => {
+    const fixture = TestBed.createComponent(Welcome);
+    fixture.detectChanges();
+    const req = http.expectOne('http://localhost:8080/api/me');
+    req.flush({ email: 'user@example.com', name: '' });
+
+    await fixture.whenStable();
+    expect(fixture.componentInstance.name()).toBeNull();
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const heading = compiled.querySelector('h1');
+    expect(heading?.textContent).toContain('Welcome!');
+  });
+
   it('should redirect to /login on 401 error', () => {
     const fixture = TestBed.createComponent(Welcome);
     fixture.detectChanges();

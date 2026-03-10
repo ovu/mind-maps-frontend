@@ -6,6 +6,7 @@ const API_BASE = 'http://localhost:8080';
 
 export interface UserProfile {
   email: string;
+  name?: string;
   [key: string]: unknown;
 }
 
