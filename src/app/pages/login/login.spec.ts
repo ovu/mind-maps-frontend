@@ -39,7 +39,7 @@ describe('Login', () => {
     http.expectNone('http://localhost:8080/auth/login');
   });
 
-  it('should call login API and navigate to /welcome on success', () => {
+  it('should call login API and navigate to /mind-maps on success', () => {
     const fixture = TestBed.createComponent(Login);
     const component = fixture.componentInstance;
     const navigateSpy = vi.spyOn(router, 'navigate');
@@ -52,7 +52,7 @@ describe('Login', () => {
     req.flush({ token: 'jwt-token' });
 
     expect(localStorage.getItem('auth_token')).toBe('jwt-token');
-    expect(navigateSpy).toHaveBeenCalledWith(['/welcome']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/mind-maps']);
   });
 
   it('should display server error message on failure', () => {

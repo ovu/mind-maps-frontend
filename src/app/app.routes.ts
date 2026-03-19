@@ -3,7 +3,7 @@ import { authGuard } from './guards/auth.guard';
 import { guestGuard } from './guards/guest.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', redirectTo: 'mind-maps', pathMatch: 'full' },
   {
     path: 'register',
     loadComponent: () => import('./pages/register/register').then(m => m.Register),
@@ -15,8 +15,13 @@ export const routes: Routes = [
     canActivate: [guestGuard]
   },
   {
-    path: 'welcome',
-    loadComponent: () => import('./pages/welcome/welcome').then(m => m.Welcome),
+    path: 'mind-maps',
+    loadComponent: () => import('./pages/mind-map-list/mind-map-list').then(m => m.MindMapList),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'mind-maps/:id',
+    loadComponent: () => import('./pages/mind-map-editor/mind-map-editor').then(m => m.MindMapEditor),
     canActivate: [authGuard]
   }
 ];

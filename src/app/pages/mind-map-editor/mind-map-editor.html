@@ -1,0 +1,200 @@
+@if (loading()) {
+  <div class="min-h-screen bg-gray-50 flex items-center justify-center">
+    <p class="text-gray-500 text-sm">Loading mind map…</p>
+  </div>
+} @else if (error()) {
+  <div class="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div class="text-center">
+      <p class="text-red-600 text-sm mb-4">{{ error() }}</p>
+      <button
+        (click)="goBack()"
+        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors"
+      >
+        Back to Mind Maps
+      </button>
+    </div>
+  </div>
+} @else if (mindMap()) {
+  <div class="h-screen flex flex-col bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-4 shrink-0">
+      <button
+        (click)="goBack()"
+        class="p-1.5 text-gray-500 hover:text-gray-900 rounded hover:bg-gray-100 transition-colors"
+        title="Back"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <h1 class="text-lg font-semibold text-gray-900 flex-1 truncate">{{ mindMap()!.name }}</h1>
+
+      <!-- Search -->
+      <div class="relative">
+        <div class="relative">
+          <input
+            type="text"
+            placeholder="Search nodes…"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+            (input)="onSearchInput()"
+            (focus)="onSearchInput()"
+            class="w-56 px-3 py-1.5 pl-8 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <svg class="absolute left-2.5 top-2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          @if (searchQuery()) {
+            <button
+              (click)="clearSearch()"
+              class="absolute right-2 top-1.5 text-gray-400 hover:text-gray-600"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          }
+        </div>
+
+        <!-- Search Dropdown -->
+        @if (showSearchDropdown() && searchResults().length > 0) {
+          <div class="absolute right-0 top-full mt-1 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-60 overflow-y-auto">
+            @for (result of searchResults(); track result.id) {
+              <button
+                (click)="selectSearchResult(result)"
+                class="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 transition-colors flex items-center gap-2"
+              >
+                <span class="w-2 h-2 rounded-full shrink-0"
+                      [style.background-color]="result.color || '#d1d5db'"></span>
+                <span class="truncate">{{ result.text || result.nodeType }}</span>
+                <span class="text-xs text-gray-400 shrink-0">{{ result.nodeType }}</span>
+              </button>
+            }
+          </div>
+        }
+      </div>
+    </header>
+
+    <!-- Editor Body -->
+    <div class="flex-1 relative overflow-hidden">
+      <!-- Canvas -->
+      <div class="absolute inset-0">
+        <ngx-graph
+        #graphComponent
+        [nodes]="graphNodes()"
+        [links]="graphLinks()"
+        [layout]="'dagreCluster'"
+        [layoutSettings]="layoutSettings"
+        [update$]="graphUpdate$"
+        [zoomToFit$]="zoomToFit$"
+        [enableZoom]="graphLinks().length > 0"
+        [autoCenter]="autoZoomEnabled() && graphLinks().length > 0"
+        [autoZoom]="autoZoomEnabled() && graphLinks().length > 0"
+        [draggingEnabled]="true"
+        [panningEnabled]="true"
+        (select)="onNodeSelect($event)"
+        class="block w-full h-full"
+      >
+          <!-- Node Template -->
+          <ng-template #nodeTemplate let-node>
+            <svg:g [attr.opacity]="getNodeOpacity(node)">
+              @if (isNodeHighlighted(node.id)) {
+                <svg:rect
+                  [attr.width]="(node.dimension?.width || 180) + 8"
+                  [attr.height]="(node.dimension?.height || 70) + 8"
+                  [attr.x]="-4"
+                  [attr.y]="-4"
+                  rx="12"
+                  ry="12"
+                  fill="#F59E0B"
+                  opacity="0.3"
+                  class="pointer-events-none"
+                />
+              }
+              <svg:rect
+                [attr.width]="node.dimension?.width || 180"
+                [attr.height]="node.dimension?.height || 70"
+                rx="8"
+                ry="8"
+                [attr.fill]="getNodeColor(node)"
+                [attr.stroke]="getNodeBorderColor(node)"
+                [attr.stroke-width]="isNodeSelected(node.id) || isNodeHighlighted(node.id) ? 3 : 1.5"
+                class="cursor-pointer"
+                (mousedown)="onNodeMouseDown($event, node.id)"
+                (mouseup)="onNodeMouseUp($event, node.id)"
+              />
+              <svg:text
+                [attr.x]="(node.dimension?.width || 180) / 2"
+                [attr.y]="(node.dimension?.height || 70) / 2"
+                text-anchor="middle"
+                dominant-baseline="central"
+                class="cursor-pointer select-none pointer-events-none"
+                font-size="13"
+                fill="#111827"
+              >
+                {{ (node.label | slice:0:24) || node.data.nodeType }}
+              </svg:text>
+              @if (node.data.nodeType === 'link') {
+                <svg:text
+                  [attr.x]="(node.dimension?.width || 180) / 2"
+                  [attr.y]="(node.dimension?.height || 70) / 2 + 16"
+                  text-anchor="middle"
+                  dominant-baseline="central"
+                  class="pointer-events-none"
+                  font-size="11"
+                  fill="#3B82F6"
+                >
+                  link
+                </svg:text>
+                @if (node.data.value) {
+                  <svg:g
+                    [attr.transform]="'translate(' + ((node.dimension?.width || 180) - 24) + ', 4)'"
+                    class="cursor-pointer"
+                    (click)="openNodeLink($event, node)"
+                  >
+                    <svg:rect width="20" height="20" rx="4" ry="4" fill="white" opacity="0.8"/>
+                    <svg:path
+                      d="M6 13L13 6M13 6H8M13 6V11"
+                      stroke="#3B82F6"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      fill="none"
+                      transform="translate(1, 1)"
+                    />
+                  </svg:g>
+                }
+              }
+            </svg:g>
+          </ng-template>
+
+          <!-- Link Template -->
+          <ng-template #linkTemplate let-link>
+            <svg:g>
+              <svg:path
+                [attr.d]="link.line"
+                stroke="#9CA3AF"
+                stroke-width="1.5"
+                fill="none"
+              />
+            </svg:g>
+          </ng-template>
+        </ngx-graph>
+      </div>
+
+      <!-- Side Panel (overlay) -->
+      @if (selectedNode()) {
+        <div class="absolute top-0 right-0 bottom-0 z-10 shadow-lg">
+          <app-node-editor-panel
+            [mindMapId]="mindMap()!.id"
+            [node]="selectedNode()!"
+            [isRoot]="selectedNode()!.id === mindMap()!.rootNode.id"
+            (nodeUpdated)="onNodeUpdated()"
+            (nodeDeleted)="onNodeUpdated(); deselectNode()"
+            (close)="deselectNode()"
+          />
+        </div>
+      }
+    </div>
+  </div>
+}

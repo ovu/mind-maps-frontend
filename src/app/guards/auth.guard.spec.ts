@@ -47,7 +47,7 @@ describe('guestGuard', () => {
     expect(result).toBe(true);
   });
 
-  it('redirects to /welcome when already authenticated', () => {
+  it('redirects to /mind-maps when already authenticated', () => {
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
@@ -56,6 +56,6 @@ describe('guestGuard', () => {
     });
     const router = TestBed.inject(Router);
     const result = TestBed.runInInjectionContext(() => guestGuard({} as any, {} as any));
-    expect(result).toEqual(router.createUrlTree(['/welcome']));
+    expect(result).toEqual(router.createUrlTree(['/mind-maps']));
   });
 });

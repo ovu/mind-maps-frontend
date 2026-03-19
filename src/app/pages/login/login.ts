@@ -31,7 +31,7 @@ export class Login {
     this.serverError.set(null);
     const { email, password } = this.form.value;
     this.auth.login(email!, password!).subscribe({
-      next: () => this.router.navigate(['/welcome']),
+      next: () => this.router.navigate(['/mind-maps']),
       error: (err) => {
         this.serverError.set(err.error?.error ?? 'Login failed. Please check your credentials.');
         this.loading.set(false);
